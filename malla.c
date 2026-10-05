@@ -5,53 +5,61 @@
 #include <signal.h>
 
 void nada() {
-    /* Manejador de señal vacío */
+   
 }
 
 int main(int numero_argumentos, char *argumentos[]) {
-    int max_profundidad, total_cadenas;
-    int idx_cadena, idx_nivel;
+    int max_filas, max_columnas;
+    int idx_columna, idx_fila;
     pid_t id_proceso;
 
-    if (numero_argumentos == 3) {
-        max_profundidad = atoi(argumentos[1]);
-        total_cadenas = atoi(argumentos[2]);
+    if (numero_argumentos != 3) {
+        return 1;
+    }
 
-        if (max_profundidad > 0 && total_cadenas > 0) {
+    max_filas = atoi(argumentos[1]);      
+    max_columnas = atoi(argumentos[2]);   
 
-            for (idx_cadena = 1; idx_cadena <= total_cadenas; idx_cadena++) {
+    if (max_filas <= 0 || max_columnas <= 0) {
+        return 1;
+    }
+
+    
+    signal(SIGALRM, nada);
+
+    for (idx_columna = 1; idx_columna <= max_columnas; idx_columna++) {
+        id_proceso = fork();
+
+        if (id_proceso == 0) {
+            
+            
+            for (idx_fila = 2; idx_fila <= max_filas; idx_fila++) {
                 id_proceso = fork();
 
                 if (id_proceso == 0) {
-                    // Proceso hijo (inicio de una nueva cadena)
-                    for (idx_nivel = 1; idx_nivel <= max_profundidad - 1; idx_nivel++) {
-                        id_proceso = fork();
-
-                        if (id_proceso != 0) {
-                            // Proceso padre en el nivel actual: espera al siguiente subproceso
-                            wait(NULL);
-                            exit(0);
-                        }
-                    }
-
-                    // Se alcanza el último nivel de la cadena
-                    if (idx_nivel == max_profundidad) {
-                        signal(SIGALRM, nada);
-                        alarm(10);
-                        pause();
-                        exit(0);
-                    }
+                   
+                    continue;
+                } else {
+                    
+                    break;
                 }
             }
 
-            // El proceso principal espera a que finalicen todas las cadenas creadas
-            if (idx_cadena == total_cadenas + 1) {
-                int k;
-                for (k = 1; k <= total_cadenas; k++) {
-                    wait(NULL);
-                }
+           
+            alarm(15);
+            pause();
+
+            if (id_proceso > 0) {
+                wait(NULL);
             }
+
+            exit(0);
         }
+    }
+
+    
+    for (idx_columna = 1; idx_columna <= max_columnas; idx_columna++) {
+        wait(NULL);
     }
 
     return 0;
