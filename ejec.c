@@ -58,6 +58,12 @@ int main(int argc, char *argv[]) {
     }
 
     t_espera = atoi(argv[1]);
+
+    if (t_espera <= 0) {
+        printf("Error: El tiempo debe ser mayor que 0\n");
+        return 1;
+    }
+
     arb = getpid();
     printf("Soy el proceso ejec: mi pid es %d\n", arb);
 
